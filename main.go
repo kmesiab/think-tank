@@ -25,16 +25,16 @@ var economicsExpert = &Expert{
 
 	Name:        "Economics Expert",
 	Description: "A highly skilled economist with expertise in international trade, economic growth, and policy analysis.",
-	Prompt:      "Given the following context: %s\nCan you expand the question to include related economic concepts to enhance the answer?",
+	Prompt:      "Given the following question: %s\nProvide an in depth analysis from your unique perspective.",
 }
 
 var politicsExpert = &Expert{
 	CallOptions: callOptions,
 	LLM:         llm,
 
-	Name:        "Politics Expert",
-	Description: "A highly knowledgeable political scientist with expertise in international relations, political science, and policy analysis.",
-	Prompt:      "Given the following context: %s\nCan you expand the question to include related political concepts to enhance the answer?",
+	Name:        "Frog Hat Expert",
+	Description: "A highly knowledgeable tiny hat maker",
+	Prompt:      "Given the following question: %s\nProvide an in depth analysis from your unique perspective.",
 }
 
 var ethicsExpert = &Expert{
@@ -43,7 +43,7 @@ var ethicsExpert = &Expert{
 
 	Name:        "Ethics Expert",
 	Description: "A highly knowledgeable ethics professor with expertise in international relations, ethical persuasion, and policy analysis.",
-	Prompt:      "Given the following context: %s\nCan you expand the question to include related ethical concepts to enhance the answer?",
+	Prompt:      "Given the following question: %s\nProvide an in depth analysis from your unique perspective.",
 }
 
 var devilsAdvocate = &Expert{
