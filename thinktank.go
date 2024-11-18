@@ -77,7 +77,7 @@ func (tt *ThinkTank) Answer(ctx context.Context, input string) (string, error) {
 			opinion := fmt.Sprintf("%s: %s\n", expertResult.Expert.Name, expertResult.Text)
 
 			expertOpinion := llms.MessageContent{
-				Role:  llms.ChatMessageTypeHuman,
+				Role:  llms.ChatMessageTypeSystem,
 				Parts: []llms.ContentPart{llms.TextPart(opinion)},
 			}
 
