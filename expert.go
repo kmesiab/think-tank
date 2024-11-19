@@ -29,6 +29,20 @@ type ExpertResult struct {
 	Err      error               `json:"err"`
 }
 
+// Evaluate processes the input string using the configured language model (LLM)
+// and returns an ExpertResult containing the response from the LLM.
+//
+// Parameters:
+//
+//	ctx - The context for controlling cancellation and timeouts.
+//	input - The input string to be evaluated by the LLM.
+//
+// Returns:
+//
+//	*ExpertResult - A struct containing the response from the LLM, the expert
+//	                instance, the text of the response, and any error encountered.
+//	error - An error if the LLM is not set, the prompt is not set, or if there
+//	        is an issue generating content from the LLM.
 func (e *Expert) Evaluate(ctx context.Context, input string) (*ExpertResult, error) {
 
 	if e.LLM == nil {
