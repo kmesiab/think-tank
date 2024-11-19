@@ -8,8 +8,7 @@ import (
 )
 
 type ExpertInterface interface {
-	Evaluate(ctx context.Context, input string, opts llms.CallOption) (*ExpertResult, error)
-	SetPrompt(prompt string) *Expert
+	Evaluate(ctx context.Context, input string) (*ExpertResult, error)
 }
 
 type Expert struct {

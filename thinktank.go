@@ -13,13 +13,13 @@ const DefaultConcurrency = 5
 type ThinkTank struct {
 	Prompt      string
 	Model       llms.Model
-	Experts     []*Expert
+	Experts     []ExpertInterface
 	Concurrency int
 }
 
-func NewThinkTank(model llms.Model, experts ...*Expert) *ThinkTank {
+func NewThinkTank(model llms.Model, experts ...ExpertInterface) *ThinkTank {
 	return &ThinkTank{
-		Prompt:      "Consider the points from all experts, then provide a comprehensive and definitive answer to the question: %s",
+		Prompt:      "Weigh and judge the experts answers against each other.  Eliminate contradictions. Then provide a comprehensive and definitive answer to the question: %s",
 		Model:       model,
 		Experts:     experts,
 		Concurrency: DefaultConcurrency,
@@ -39,7 +39,7 @@ func (tt *ThinkTank) Evaluate(ctx context.Context, input string) *ThinkTankResul
 	for _, expert := range tt.Experts {
 		wg.Add(1)
 
-		go func(expert *Expert) {
+		go func(expert ExpertInterface) {
 			defer wg.Done()
 			result, err := expert.Evaluate(ctx, input)
 			result.Err = err
@@ -60,40 +60,32 @@ func (tt *ThinkTank) Evaluate(ctx context.Context, input string) *ThinkTankResul
 func (tt *ThinkTank) Answer(ctx context.Context, input string) (string, error) {
 	result := tt.Evaluate(ctx, input)
 
-	var messages []llms.MessageContent
-
-	// First we innocently pose the question verbatim
-	originalQuestion := llms.MessageContent{
-		Role:  llms.ChatMessageTypeHuman,
-		Parts: []llms.ContentPart{llms.TextPart(input)},
-	}
-
-	messages = append(messages, originalQuestion)
+	var expertsReports = ""
 
 	// Next we let each expert chime in
 	for _, expertResult := range result.ExpertResults {
-
 		if expertResult.Err == nil {
-			opinion := fmt.Sprintf("%s: %s\n", expertResult.Expert.Name, expertResult.Text)
 
-			expertOpinion := llms.MessageContent{
-				Role:  llms.ChatMessageTypeSystem,
-				Parts: []llms.ContentPart{llms.TextPart(opinion)},
-			}
-
-			messages = append(messages, expertOpinion)
+			expertsReports += fmt.Sprintf("%s: %s\n\n", expertResult.Expert.Name, expertResult.Text)
 		}
 	}
 
-	// Lastly we instruct the LLM to re-answer the question in light of
+	// Concatenate all expert reports into one message as context
+	expertOpinions := llms.MessageContent{
+		Role:  llms.ChatMessageTypeSystem,
+		Parts: []llms.ContentPart{llms.TextPart(expertsReports)},
+	}
+
+	// Next we instruct the LLM to re-answer the question in light of
 	// the new expert opinions
 	thinkTankPrompt := fmt.Sprintf(tt.Prompt, input)
+
 	systemMessage := llms.MessageContent{
-		Role:  llms.ChatMessageTypeSystem,
+		Role:  llms.ChatMessageTypeHuman,
 		Parts: []llms.ContentPart{llms.TextPart(thinkTankPrompt)},
 	}
 
-	messages = append(messages, systemMessage)
+	var messages = []llms.MessageContent{systemMessage, expertOpinions}
 
 	content, err := tt.Model.GenerateContent(ctx, messages)
 
