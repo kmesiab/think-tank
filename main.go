@@ -11,12 +11,9 @@ import (
 var llm, _ = openai.New()
 
 var callOptions = &llms.CallOptions{
-	Model:          "gpt-4o-mini",
-	CandidateCount: 0,
-	MaxTokens:      1024,
-	Temperature:    0.9,
-	Tools:          nil,
-	ToolChoice:     nil,
+	Model:       "gpt-4o-latest",
+	MaxTokens:   2048,
+	Temperature: 0.7,
 }
 
 var economicsExpert = &Expert{
